@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/filipe/ros/catkin_ws_espeleo/devel/include",
+                "/opt/ros/kinetic/include",
+                "/home/filipe/ros/catkin_ws_espeleo/src/ouster_example/ouster_client/include",
+                "/home/filipe/ros/catkin_ws_espeleo/src/ouster_example/ouster_ros/include",
+                "/home/filipe/ros/catkin_ws_espeleo/src/ouster_example/ouster_viz/include",
+                "/usr/include"
+            ],
+            "name": "Linux",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

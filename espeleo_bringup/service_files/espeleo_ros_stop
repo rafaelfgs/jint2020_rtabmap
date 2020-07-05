@@ -1,0 +1,19 @@
+#!/bin/bash
+
+function log() {
+  logger -s -p user.$1 ${@:2}
+}
+
+log info "espeleo_ros: Using workspace setup file /home/espeleo/catkin_ws/devel/setup.bash"
+source /home/espeleo/catkin_ws/devel/setup.bash
+
+log_path="/tmp"
+
+source /etc/itv/env.sh
+log info "espeleo_ros: Stoping service ROS_HOSTNAME=$ROS_HOSTNAME, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI"
+
+# Punch it.
+export ROS_HOME=$(echo ~espeleo)/.ros
+export ROS_LOG_DIR=$log_path
+
+kill -s TERM $(cat $log_path/espeleo_ros.pid)

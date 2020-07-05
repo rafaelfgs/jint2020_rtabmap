@@ -1,0 +1,118 @@
+<!-- 
+    "Core" launch file for espeleorobot. This brings up just what is needed
+    for the motor controller, odometry and the URDF.
+-->
+
+<launch>
+    <arg name="record_text_and_locomotion" default="true" />
+    
+    <rosparam file="$(find espeleo_bringup)/cfg/espeleo_core_params.yaml" command="load" ns=""/>
+    <node name="espeleo" pkg="espeleo_bringup" type="dyn_reconfigure_server.py" respawn="true" />
+    <include file="$(find espeleo_locomotion)/launch/espeleo_locomotion_test.launch"></include>
+    <include file="$(find espeleo_io)/launch/espeleo_io.launch"></include>
+    <include file="$(find ros_service_store_rtsp)/launch/store_rtsp_service.launch"></include>
+    <include file="$(find kacanopen)/launch/espeleo_kacanopen.launch"></include>
+    <include file="$(find realsense2_camera)/launch/rs_t265_dist.launch"></include>
+
+<!-- Modifications made at UFMG -->
+  <!-- IMU -->
+  <!--include file="$(find ethzasl_xsens_driver)/launch/xsens_driver.launch"></include -->
+  <!-- parameters -->
+    <arg name="device" default="auto" doc="device file of the IMU"/>
+    <arg name="baudrate" default="0" doc="baudrate of the IMU"/>
+    <arg name="timeout" default="0.002" doc="timeout for the IMU communication"/>
+    <arg name="initial_wait" default="0.1" doc="initial wait to allow device to come up"/>
+    <arg name="frame_id" default="/imu" doc="frame id of the IMU"/>
+    <arg name="frame_local" default="ENU" doc="desired frame orientation (ENU, NED or NWU)"/>
+    <arg name="no_rotation_duration" default="0" doc="duration (int in seconds) of the no-rotation calibration procedure"/>
+    <arg name="angular_velocity_covariance_diagonal" default="[0.0004, 0.0004, 0.0004]" doc="Diagonal elements of angular velocity covariance matrix"/>
+    <arg name="linear_acceleration_covariance_diagonal" default="[0.0004, 0.0004, 0.0004]" doc="Diagonal elements of linear acceleration covariance matrix"/>
+    <arg name="orientation_covariance_diagonal" default="[0.01745, 0.01745, 0.15708]" doc="Diagonal elements of the orientation covariance matrix"/>
+    <!-- node -->
+	<node pkg="xsens_driver" type="mtnode.py" name="xsens_driver" output="screen" >
+		<param name="device" value="$(arg device)"/>
+		<param name="baudrate" value="$(arg baudrate)"/>
+		<param name="timeout" value="$(arg timeout)"/>
+		<param name="initial_wait" value="$(arg initial_wait)"/>
+		<param name="frame_id" value="$(arg frame_id)"/>
+		<param name="frame_local" value="$(arg frame_local)"/>
+		<param name="no_rotation_duration" value="$(arg no_rotation_duration)"/>
+		<rosparam param="angular_velocity_covariance_diagonal" subst_value="True">$(arg angular_velocity_covariance_diagonal)</rosparam>
+		<rosparam param="linear_acceleration_covariance_diagonal" subst_value="True">$(arg linear_acceleration_covariance_diagonal)</rosparam>
+		<rosparam param="orientation_covariance_diagonal" subst_value="True">$(arg orientation_covariance_diagonal)</rosparam>
+	</node>
+
+  
+    <!--include file="$(find xsens_ros_mti_driver)/launch/xsens_mti_node.launch"></include--> 
+  
+  <!--TFs-->  
+    <!--include file="$(find espeleo_navigation)/espeleo_description/launch/espeleo_description.launch"></include-->
+      <!-- send urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find espeleo_description)/urdf/espeleo.xacro'" />
+  <!--GUI used to send fake joint values-->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+  </node>
+ 
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="odom_robot_footprint_broadcaster" args="0 0 0 0 0 0 1 base_link robot_footprint 100" />
+  <node pkg="tf" type="static_transform_publisher" name="torre_ouster_broadcaster" args="0 0 0 0 0 0 1 torre os1_sensor 100" />
+
+
+<!-- ==================================== Rosbag ======================================== -->
+  <!--node pkg="rosbag" type="record" name="record" args="-a" output="screen"/-->
+
+
+
+<!-- LASER  -->
+
+<!--roslaunch ouster_ros os1.launch os1_hostname:=192.168.1.61 os1_udp_dest:=192.168.1.3 lidar_mode:=512x10  -->
+<!--include file="$(find ouster_ros)/os1.launch"></include-->
+
+    
+<!--  <arg name="os1_hostname" default="" doc="192.168.1.61"/>
+  <arg name="os1_udp_dest" default="" doc="192.168.1.3"/>
+  <arg name="os1_lidar_port" default="7502" doc="port to which the sensor should send lidar data"/>
+  <arg name="os1_imu_port" default="7503" doc="port to which the sensor should send imu data"/>
+  <arg name="replay" default="false" doc="do not connect to a sensor; expect /os1_node/{lidar,imu}_packets from replay"/>
+  <arg name="lidar_mode" default="" doc="resolution and rate: 512x10"/>
+  <arg name="metadata" default="" doc="override default metadata file for replays"/>
+  <arg name="viz" default="false" doc="whether to run a simple visualizer"/>
+  <arg name="image" default="false" doc="publish range/intensity/noise image topic"/>   -->
+
+<!--  <node pkg="ouster_ros" name="os1_node" type="os1_node" output="screen" required="true">
+    <param name="~/lidar_mode" type="string" value="$(arg lidar_mode)"/>
+    <param name="~/replay" value="$(arg replay)"/>
+    <param name="~/os1_hostname" value="$(arg os1_hostname)"/>
+    <param name="~/os1_udp_dest" value="$(arg os1_udp_dest)"/>
+    <param name="~/os1_lidar_port" value="$(arg os1_lidar_port)"/>
+    <param name="~/os1_imu_port" value="$(arg os1_imu_port)"/>
+    <param name="~/metadata" value="$(arg metadata)"/>
+  </node>  -->
+
+<!--  <node pkg="ouster_ros" type="os1_cloud_node" name="os1_cloud_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/lidar_packets" to="/os1_node/lidar_packets"/>
+    <remap from="~/imu_packets" to="/os1_node/imu_packets"/>
+  </node> -->
+
+<!--  <node if="$(arg viz)" pkg="ouster_ros" name="viz_node" type="viz_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/points" to="/os1_cloud_node/points"/>
+  </node> -->
+
+<!--  <node if="$(arg image)" pkg="ouster_ros" name="img_node" type="img_node" output="screen" required="true">
+    <remap from="~/os1_config" to="/os1_node/os1_config"/>
+    <remap from="~/points" to="/os1_cloud_node/points"/>
+  </node>  -->
+
+   <node pkg="rosbag" type="record" name="rosbag_record_text_and_locomotion"
+       args="record -o $(find espeleo_bringup)/bags/ /camera/accel/imu_info /camera/accel/sample /camera/dist /camera/odom/sample /cmd_vel /espeleo/parameter_descriptions /espeleo/parameter_updates /espeleo_io/backLight /espeleo_io/frontLight /joint_states /rosout /rosout_agg /statistics /tf /tf_static"
+       if="$(arg record_text_and_locomotion)" />
+
+</launch>
+
+
+

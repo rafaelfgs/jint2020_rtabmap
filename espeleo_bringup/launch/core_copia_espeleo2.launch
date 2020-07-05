@@ -1,0 +1,38 @@
+<!-- 
+    "Core" launch file for espeleorobot. This brings up just what is needed
+    for the motor controller, odometry and the URDF.
+-->
+
+<launch>
+    <arg name="record_text_and_locomotion" default="true" />
+    
+    <rosparam file="$(find espeleo_bringup)/cfg/espeleo_core_params.yaml" command="load" ns=""/>
+    <node name="espeleo" pkg="espeleo_bringup" type="dyn_reconfigure_server.py" respawn="true" />
+    <include file="$(find espeleo_locomotion)/launch/espeleo_locomotion_test.launch"></include>
+    <include file="$(find espeleo_io)/launch/espeleo_io.launch"></include>
+    <include file="$(find ros_service_store_rtsp)/launch/store_rtsp_service.launch"></include>
+    <include file="$(find kacanopen)/launch/espeleo_kacanopen.launch"></include>
+  
+  <!--TFs-->  
+    <!--include file="$(find espeleo_navigation)/espeleo_description/launch/espeleo_description.launch"></include-->
+      <!-- send urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find espeleo_description)/urdf/espeleo.xacro'" />
+  <!--GUI used to send fake joint values-->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+  </node>
+ 
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="odom_robot_footprint_broadcaster" args="0 0 0 0 0 0 1 base_link robot_footprint 100" />
+  <node pkg="tf" type="static_transform_publisher" name="torre_ouster_broadcaster" args="0 0 0 0 0 0 1 torre os1_sensor 100" />
+
+
+<!-- ==================================== Rosbag ======================================== -->
+  
+
+</launch>
+
+
+

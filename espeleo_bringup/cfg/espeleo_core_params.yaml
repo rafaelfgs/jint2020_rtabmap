@@ -1,0 +1,4 @@
+espeleo:
+    forward_orientation: true
+    turbo_button: true
+enable_statistics: true

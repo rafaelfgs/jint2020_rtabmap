@@ -1,0 +1,49 @@
+ # espeleo locomotion parameters
+ espeleo_locomotion: 
+
+  # default locomotion type
+  # 1 - 6 wheels mode
+  # 2 - 6 legs mode
+  locomotion_mode: 1
+
+  # control update rate [Hz]
+  control_rate: 10.0
+
+  # Max axis joints speed [rad/s]
+  joints_maxJointsSpeed: 3.1415
+
+  # EspeleoRobo's max translational and rotational speeds 
+  espeleo_maxTranslationalSpeed: 10.0   #[m/s]
+  espeleo_maxRotationalSpeed: 10.0      #[rad/s]
+
+  # wheels radius [m]
+  wheeled_radius: 0.1442   
+
+  # wheeled mode kinematic parameters 
+  wheeled_kinematic_lambda: 0.965
+  wheeled_kinematic_ycir: 0.531
+
+  # minimum phi slow angle for legged mode [rad]
+  legged_phis_min: 0.1745
+
+  # maximum phi slow angle for legged mode [rad]
+  legged_phis_max: 0.7854
+
+  # Planetary gear reduction - Same for all wheels 
+  planetary_gear_reduction: 111.0
+
+  # Internal wheel reduction - Synchronous belt (44/21) for central wheels 
+  central_wheel_reduction: 2.095238095
+
+  # External wheel reduction - Synchronous belt (50/26) for extremity wheels
+  extremity_wheel_reduction: 1.9230769236
+
+  # Width from internal wheels
+  internal_wheel_width: 0.340
+
+  # Width from external wheels
+  external_wheel_width: 0.441
+
+  # Number of Wheels (4 or 6)
+  number_wheels: 6
+

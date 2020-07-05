@@ -1,0 +1,6 @@
+<launch>
+	<!-- ESPELEO_LOCOMOTION -->
+	
+	<rosparam file="$(find espeleo_locomotion)/config/locomotion_parameters.yaml" command="load" ns=""/>		
+	<node name="espeleo_locomotion_wheels" pkg="espeleo_locomotion" type="espeleo_locomotion_differential.py" output="screen" respawn="true"/>
+</launch>

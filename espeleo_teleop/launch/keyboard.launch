@@ -1,0 +1,6 @@
+<launch>
+
+	<!-- TELEOP_KEYBOARD -->
+	<node name="teleop_node_keyboard" pkg="espeleo_teleop" type="keyboard.py" respawn="true" output="screen"/>
+
+</launch>

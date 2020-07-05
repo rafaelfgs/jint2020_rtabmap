@@ -1,0 +1,131 @@
+<launch>
+
+    <arg name = "rtab_used" default = "true"/>
+
+    <node name = "espeleo"
+          pkg = "espeleo_bringup"
+          type = "dyn_reconfigure_server.py"
+          respawn = "true"
+          output = "screen"/>
+
+    <node name = "flip_image"
+          pkg = "required_files"
+          type = "flip_image.py"
+          output = "screen"/>
+
+    <node name   = "rgb_compress"
+          pkg    = "image_transport"
+          type   = "republish"
+          args   = "raw in:=/rgb/image_rect/
+                    compressed out:=/rgb/image_rect/"
+          output = "screen"/>
+
+    <node name   = "depth_compress"
+          pkg    = "image_transport"
+          type   = "republish"
+          args   = "raw in:=/depth/image_rect/
+                    compressedDepth out:=/depth/image_rect/"
+          output = "screen"/>
+
+    <node name = "odom_to_init"
+          pkg = "required_files"
+          type = "odom_to_init.py"
+          output = "screen"/>
+
+    <node name = "odom_to_file"
+          pkg = "required_files"
+          type = "odom_to_file.py"
+          output = "screen"/>
+
+    <!--node name = "cloud_to_file"
+          pkg = "required_files"
+          type = "cloud_to_file.py"
+          output = "screen"/-->
+
+    <node name = "init_tf"
+          pkg = "tf" 
+          type = "static_transform_publisher"
+          args = "376 79 -5.6 0 0 0.8191520 0.5735764 world base_init 30"
+          output = "screen"/>
+
+    <node name = "rtab_tf"
+          pkg = "tf" 
+          type = "static_transform_publisher"
+          args = "0.07 0 0.25 -0.5 0.5 -0.5 0.5 base_init d435i_init 30"
+          output = "screen"/>
+
+    <node name = "base_tf"
+          pkg = "tf" 
+          type = "static_transform_publisher"
+          args = "0 0.25 -0.07 0.5 -0.5 0.5 0.5 d435i_link chassis_link 30"
+          output = "screen"/>
+
+    <!--node name = "imu_tf"
+          pkg = "tf" 
+          type = "static_transform_publisher"
+          args = "0 0 0.16 0 0 0 1 chassis_link imu_link 30"
+          output = "screen"/-->
+
+    <!--node name = "sensor_to_imu"
+          pkg = "required_files"
+          type = "sensor_to_imu.py"
+          output = "screen"/-->
+
+    <!--node name = "imu_filter"
+          pkg = "imu_complementary_filter"
+          type = "complementary_filter_node"
+          args = "_fixed_frame:=imu_link
+                  _orientation_stddev:=0.1"
+          output = "screen">
+          <remap from="/imu/data_raw" to="/imu/data_raw"/>
+          <remap from="/imu/data"     to="/imu/world"/>
+    </node-->
+
+    <include file = "$(find espeleo_locomotion)/launch/espeleo_locomotion_differential.launch"/>
+
+    <rosparam file = "$(find espeleo_vrep_simulation)/cfg/espeleo_sim_parameters.yaml"
+              command = "load"
+              ns = ""/>
+
+    <node name = "point_cloud_converter"
+          pkg = "point_cloud_converter"
+          type = "point_cloud_converter_node"
+          output = "screen">
+
+        <remap from = "/points2_in" to = "/rtabmap/octomap_occupied_space"/>
+        <remap from = "/points_out" to = "/cloud/points"/>
+
+    </node>
+
+    <include file = "$(find rtabmap_ros)/launch/rtabmap.launch" if = "$(arg rtab_used)">
+
+        <arg name ="stereo"                   value = "false"/>
+
+        <arg name = "rgb_topic"               value = "/rgb/image_rect"/>
+        <arg name = "depth_topic"             value = "/depth/image_rect"/>
+        <arg name = "camera_info_topic"       value = "/rgb/camera_info"/>
+        <arg name = "depth_camera_info_topic" value = "/depth/camera_info"/>
+
+        <arg name = "args"                    value = "--delete_db_on_start
+                                                       --Odom/Holonomic false
+                                                       --Odom/ResetCountdown 1
+                                                       --Rtabmap/StartNewMapOnLoopClosure true
+                                                       --Odom/Strategy 1
+                                                       --Reg/Force3DoF false"/>
+
+        <arg name = "queue_size"              value = "10"/>
+        <arg name = "approx_sync"             value = "true"/>
+        <arg name = "wait_imu_to_init"        value = "false"/>
+        <arg name = "visual_odometry"         value = "true"/>
+
+        <arg name = "odom_topic"              value = "/rtabmap/odom"/>
+        <arg name = "imu_topic"               value = "/rtabmap/imu"/>
+        <arg name = "map_frame_id"            value = "d435i_init"/>
+        <arg name = "frame_id"                value = "d435i_link"/>
+        <arg name = "use_sim_time"            value = "false"/>
+        <arg name = "rtabmapviz"              value = "false"/>
+        <arg name = "rviz"                    value = "false"/>
+
+    </include>
+
+</launch>

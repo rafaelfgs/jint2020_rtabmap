@@ -1,0 +1,10 @@
+[Unit]
+Requires=roscore.service
+PartOf=roscore.service
+After=NetworkManager.service time-sync.target roscore.service
+[Service]
+Type=simple
+User=espeleo
+ExecStart=/usr/sbin/espeleo_ros_start
+[Install]
+WantedBy=multi-user.target

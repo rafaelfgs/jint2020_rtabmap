@@ -1,0 +1,20 @@
+<launch>
+	
+	<!-- JOYSTICK -->
+	<node name="joy_node" pkg="joy" type="joy_node" respawn="true" output="screen">
+		<param name="deadzone" value="0.2" />
+		<param name="dev" value="/dev/input/espeleo_joy" />
+		<param name="autorepeat_rate" value="1" />
+		<param name="coalesce_interval" value="0.2" />
+		 
+	</node>	
+
+	<!-- TELEOP_JOY -->
+	<node name="teleop_node_joy" pkg="teleop_twist_joy" type="teleop_node" respawn="true" output="screen">
+		<param name="scale_linear" value="1" />
+		<param name="scale_angular" value="1" />
+	</node>
+
+	<node name="espeleo_joy_buttons" pkg="espeleo_teleop" type="espeleo_joy_buttons.py" respawn="true" output="screen"/>
+
+</launch>

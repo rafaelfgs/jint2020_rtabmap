@@ -1,0 +1,10 @@
+[Unit]
+Description=Setup SocketCAN interface can0
+After=multi-user.target roscore
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash -c "source /opt/ros/kinetic/setup.bash; source /etc/itv/env.sh; source /home/espeleo/catkin_ws/devel/setup.bash; bash $(rospack find espeleo_bringup)/service_files/restart_can_socket.sh;"
+ExecStop=/bin/bash -c "source /opt/ros/kinetic/setup.bash; source /etc/itv/env.sh; source /home/espeleo/catkin_ws/devel/setup.bash; bash $(rospack find espeleo_bringup)/service_files/stop_can_socket.sh;"
+[Install]
+WantedBy=multi-user.target

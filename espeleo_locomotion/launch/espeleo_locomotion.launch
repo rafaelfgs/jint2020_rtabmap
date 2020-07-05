@@ -1,0 +1,7 @@
+<launch>
+
+	<!-- ESPELEO_LOCOMOTION -->
+	<node name="espeleo_locomotion_node" pkg="espeleo_locomotion" type="espeleo_locomotion.py" respawn="true" />
+	<rosparam command="load" file="$(find espeleo_locomotion)/config/locomotion_parameters.yaml" />
+
+</launch>
